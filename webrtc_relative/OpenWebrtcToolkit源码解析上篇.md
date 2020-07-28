@@ -1,7 +1,7 @@
 
 # Open webrtc toolkit源码解析(上篇)
 
-### 珍惜他人劳动成果，转载请注明[原文地址](https://github.com/AshineReal/Inspiration/tree/master/webrtc_relative/OpenWebrtcToolkit源码解析上篇)
+### 珍惜他人劳动成果，转载请注明[原文地址](https://github.com/AshineReal/Inspiration/blob/master/webrtc_relative/OpenWebrtcToolkit%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B8%8A%E7%AF%87.md)
 
 #### [Owt](https://github.com/open-webrtc-toolkit)(Open webrtc toolkit) 是intel开源基于webrtc的旨在提供简易的音视频通话库，intel对其进行优化并增强了对处理器的优化意在展示强大的芯片处理能力，包含了跨端跨平台从终端到服务器的实现。本篇文章旨在通过分析owt源码流程来梳理webrtc在多人音视频通话中的作用。
 
@@ -532,7 +532,7 @@ socket_client_->set_open_listener([=](void) {
 由于篇幅过长剩下的流程会单独开中篇及下篇来分析
 
 
-### 珍惜他人劳动成果，转载请注明[原文地址](https://github.com/AshineReal/Inspiration/tree/master/webrtc_relative/OpenWebrtcToolkit源码解析上篇)
+### 珍惜他人劳动成果，转载请注明[原文地址](https://github.com/AshineReal/Inspiration/blob/master/webrtc_relative/OpenWebrtcToolkit%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B8%8A%E7%AF%87.md)
 
 
 
