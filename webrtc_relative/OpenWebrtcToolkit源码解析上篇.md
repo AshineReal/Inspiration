@@ -332,7 +332,7 @@ void ConferenceClientObserverObjcImpl::OnStreamAdded(
 对应的触发部分确实最终回调了didAddStream
 
 至此第十步
-10. OWTConferenceClient回调 **didAddParticipant** 及 **didAddStream **
+10. OWTConferenceClient回调 **didAddParticipant** 及 **didAddStream**
 
 
 第五步之前还未深入分析
