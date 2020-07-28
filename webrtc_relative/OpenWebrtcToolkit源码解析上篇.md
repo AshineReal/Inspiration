@@ -232,8 +232,8 @@ void ConferenceClient::Join(
 5. signaling_channel_调用connect方法及获取回调info的流程先按住不表，这里先主要分析join的加入房间流程
 6. connect回调中处理解析participant_id、user_id、role放入current_conference_info_中
 7. 解析info中房间信息 **auto room_info = info->get_map()["room"]**
-8. 解析room_info中参会者信息**auto users = room_info->get_map()["participants"]->get_vector()**并触发TriggerOnUserJoined方法
-9. 解析room_info中流信息**auto streams = room_info->get_map()["streams"]->get_vector()**并触发TriggerOnStreamAdded方法
+8. 解析room_info中参会者信息 **auto users = room_info->get_map()["participants"]->get_vector()** 并触发TriggerOnUserJoined方法
+9. 解析room_info中流信息 **auto streams = room_info->get_map()["streams"]->get_vector()** 并触发TriggerOnStreamAdded方法
 10. 这里先做保留待分析了TriggerOnUserJoined及TriggerOnStreamAdded方法以后再给出结论
 
 这里继续分析TriggerOnUserJoined及TriggerOnStreamAdded
@@ -256,7 +256,7 @@ void ConferenceClient::TriggerOnUserJoined(sio::message::ptr user_info,
 }
 ```
 
- 主要操作为**event_queue_->PostTask([&o, user] { o.OnParticipantJoined(user)**即遍历所有observers_ 触发OnParticipantJoined方法
+ 主要操作为 **event_queue_->PostTask([&o, user] { o.OnParticipantJoined(user)** 即遍历所有observers_ 触发OnParticipantJoined方法
  这里obserers_仅有ConferenceClientObserverObjcImpl实例类
  追踪到该实现部分为
 
@@ -272,7 +272,7 @@ void ConferenceClient::TriggerOnUserJoined(sio::message::ptr user_info,
 }
  ```
 
- 到这里就比较清晰了**TriggerOnUserJoined**方法最终通过OWTConferenceClientDelegate回调出去
+ 到这里就比较清晰了 **TriggerOnUserJoined** 方法最终通过OWTConferenceClientDelegate回调出去
 
  ```Objc
  -(void)conferenceClient:(OWTConferenceClient*)client didAddParticipan(OWTConferenceParticipant*)user;
@@ -289,7 +289,7 @@ void ConferenceClient::TriggerOnStreamAdded(sio::message::ptr stream_info,
 }
 ```
 
-该方法直接调用的**ParseStreamInfo**名为解析流信息,由于该方法太长(近400行代码)这里贴出主要的关键代码片段，如有对源码感兴趣的同学可自行查看对应方法的实现，这里就不贴出了
+该方法直接调用的 **ParseStreamInfo** 名为解析流信息,由于该方法太长(近400行代码)这里贴出主要的关键代码片段，如有对源码感兴趣的同学可自行查看对应方法的实现，这里就不贴出了
 
 ```cpp
 const std::lock_guard<std::mutex> lock(stream_update_observer_mutex_);
@@ -304,7 +304,7 @@ if (!joining && !updated) {
 
 ```
 和TriggerOnUserJoined一样通过observers_触发回调
-这里需要注意一个信息是conferenceClient的成员变量current_conference_info_保存了流信息**current_conference_info_->AddOrUpdateStream(remote_stream, updated)**
+这里需要注意一个信息是conferenceClient的成员变量current_conference_info_保存了流信息 **current_conference_info_->AddOrUpdateStream(remote_stream, updated)**
 
 ```Objc
 void ConferenceClientObserverObjcImpl::OnStreamAdded(
@@ -332,7 +332,7 @@ void ConferenceClientObserverObjcImpl::OnStreamAdded(
 对应的触发部分确实最终回调了didAddStream
 
 至此第十步
-10. OWTConferenceClient回调**didAddParticipant**及**didAddStream**
+10. OWTConferenceClient回调 **didAddParticipant** 及 **didAddStream **
 
 
 第五步之前还未深入分析
@@ -522,7 +522,7 @@ socket_client_->set_open_listener([=](void) {
 分析下来就是围绕 **Emit("login", login_message,[=](sio::message::list const& msg) {}** 在进行
 1. emit参数为信令"login", 参数列表为login_message,回调为msg
 2. login_message就是连接信令服务器所需参数是和信令服务器统一规定协商后的结果，实际企业项目中不一定是按照该参数配置，只需满足client验证及私密性安全性要求即可。
-3. **[=](sio::message::list const& msg) {}**回调部分取出了reconnectionTicket这个代表重连票据也就是信令重连恢复时需要传入的参数，表示该恢复会话，另外**on_success(message)**几乎回调了原始msg (见**sio::message::ptr message = msg.at(1)** msg数组0为ack的状态信息)
+3. **[=](sio::message::list const& msg) {}** 回调部分取出了reconnectionTicket这个代表重连票据也就是信令重连恢复时需要传入的参数，表示该恢复会话，另外    **on_success(message)** 几乎回调了原始msg (见 **sio::message::ptr message = msg.at(1)** msg数组0为ack的状态信息)
 4. 重连部分为else部分内容emit信令kEventNameRelogin，参数为reconnection_ticket_重连票据，然后做了timeout和error情况的处理，然后刷新重连票据等操作。
 
 到这里也比较清晰加入媒体房间的信令流程，总的来说就是通过socket.io进行的信令交互client login的时候信令服务器进行数据及授权验证，返回房间信息，client拿到房间信息并进行解析回调给上层业务
