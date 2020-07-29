@@ -170,11 +170,11 @@ void ConferenceSocketSignalingChannel::OnNotificationFromServer(
 
 **分析下来就是几个event的case**
 
-**1. kEventNameStreamMessage这个是定义的关于流的一些信息的事件**
-**2. kEventNameTextMessage这个是定义的关于文本消息的一些信息的事件(没错 这里提到了文本消息的发送，owt提供了简单的本文消息发送，丰富了基于webrtc音视频会议房间的业务场景)**
-**3. kEventNameOnUserPresence定义了关于用户进退及用户信息更新的信息事件**
-**4. kEventNameOnSignalingMessage定义了信令消息(先揭露之后再详细说明 这里其实是sdp协商过程所需的offer answer candidate等信令协商事件)**
-**5. kEventNameOnDrop消息丢失服务器关闭连接**
+1. **kEventNameStreamMessage这个是定义的关于流的一些信息的事件**
+2. **kEventNameTextMessage这个是定义的关于文本消息的一些信息的事件(没错 这里提到了文本消息的发送，owt提供了简单的本文消息发送，丰富了基于webrtc音视频会议房间的业务场景)**
+3. **kEventNameOnUserPresence定义了关于用户进退及用户信息更新的信息事件**
+4. **kEventNameOnSignalingMessage定义了信令消息(先揭露之后再详细说明 这里其实是sdp协商过程所需的offer answer candidate等信令协商事件)**
+5. **kEventNameOnDrop消息丢失服务器关闭连接**
 
 这里主要来看kEventNameStreamMessage事件
 
@@ -625,7 +625,7 @@ conferencepeerconnectionchannel中片段
 
 #### 总的来看owt信令实现了逻辑分层,conferenceclient作为最初的入口及回调最后的出口基本管控OWTConferenceClient暴露出来的接口,conferencepeerconnectionchannel管控粒度更加细致的工作，包括发布订阅流及sdp生成接收安装等主要依赖webrtc的实现，接下来就是conferencesocketsignalingchannel实现对接socketio，提供了各上层需要的信令交互最基本的api调用实现和事件监听分流回调，总结如下图所示(由于仅分析了源码部分conference模块，p2p的实现与此类似，就不多作陈述，图示也不具体给出了)
 
-![owt_level](https://github.com/AshineReal/Inspiration/blob/master/webrtc_relative/image_bed/owt_level)
+![owt_level](https://github.com/AshineReal/Inspiration/blob/master/webrtc_relative/image_bed/owt_level.jpg)
 
 
 #### 至此上中篇已经分析了owt中信令的交互流程下篇我们再详细分析其中webrtc建立流连接的过程
