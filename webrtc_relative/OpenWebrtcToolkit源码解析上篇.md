@@ -529,7 +529,7 @@ socket_client_->set_open_listener([=](void) {
 
 
 
-由于篇幅过长剩下的流程会单独开中篇及下篇来分析
+由于篇幅过长剩下的流程会单独开[中篇](https://github.com/AshineReal/Inspiration/blob/master/webrtc_relative/OpenWebrtcToolkit%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B8%AD%E7%AF%87.md)及下篇来分析
 
 
 ### 珍惜他人劳动成果，转载请注明[原文地址](https://github.com/AshineReal/Inspiration/blob/master/webrtc_relative/OpenWebrtcToolkit%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B8%8A%E7%AF%87.md)
