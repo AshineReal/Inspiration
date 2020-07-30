@@ -586,7 +586,7 @@ socketio -> conferencesocketsignalingchannel -> conferencepeerconnectionchannel
 
 ### Subscribe的流程
 
-由于publish的流程和publish类似这里只贴出关键代码
+由于subscribe的流程和publish类似这里只贴出关键代码
 
 conferenceclient中subscribe片段
 
@@ -607,9 +607,12 @@ conferenceclient中subscribe片段
       on_failure);
 ```
 
-conferencepeerconnectionchannel中片段
+conferencepeerconnectionchannel中subscribe代码片段
 
 ```cpp
+ .
+ ..
+ ...
  signaling_channel_->SendInitializationMessage(
       sio_options, "", stream->Id(),
       [this](std::string session_id) {
@@ -620,10 +623,37 @@ conferencepeerconnectionchannel中片段
       on_failure);  // TODO: on_failure
 ```
 
+查看conferencesocketsignalingchannel中SendInitializationMessage方法
+
+```cpp
+void ConferenceSocketSignalingChannel::SendInitializationMessage(
+    sio::message::ptr options,
+    std::string publish_stream_label,
+    std::string subscribe_stream_label,
+    std::function<void(std::string)> on_success,
+    std::function<void(std::unique_ptr<Exception>)> on_failure) {
+  sio::message::list message_list;
+  message_list.push(options);
+  std::string event_name;
+  if (publish_stream_label != "")
+    event_name = kEventNamePublish;
+  else if (subscribe_stream_label != "")
+    event_name = kEventNameSubscribe;
+  Emit(event_name, message_list,
+       [=](sio::message::list const& msg) {
+            ...
+            ..
+            .
+         }
+       },
+       on_failure);
+}
+```
+
 **可以看到最终都是调用SendInitializationMessage方法回调session_id
 传入的streamId并没有使用仅当作publish还是subscribe的占位判断所以实际标识还是使用的session_id**
 
-#### 总的来看owt信令实现了逻辑分层,conferenceclient作为最初的入口及回调最后的出口基本管控OWTConferenceClient暴露出来的接口,conferencepeerconnectionchannel管控粒度更加细致的工作，包括发布订阅流及sdp生成接收安装等主要依赖webrtc的实现，接下来就是conferencesocketsignalingchannel实现对接socketio，提供了各上层需要的信令交互最基本的api调用实现和事件监听分流回调，总结如下图所示(由于仅分析了源码部分conference模块，p2p的实现与此类似，就不多作陈述，图示也不具体给出了)
+#### 总的来看owt信令实现了逻辑分层,conferenceclient作为最初的入口及回调最后的出口基本管控OWTConferenceClient暴露出来的接口(业务分层),conferencepeerconnectionchannel管控粒度更加细致的工作，包括发布订阅流及sdp生成接收安装等主要依赖webrtc的实现(webrtc媒体分层)，接下来就是conferencesocketsignalingchannel实现对接socketio，提供了各上层需要的信令交互最基本的api调用实现和事件监听分流回调(信令分层)。总结如下图所示(由于仅分析了源码部分conference模块，p2p的实现与此类似，就不多作陈述，图示也不具体给出了)
 
 ![owt_level](https://github.com/AshineReal/Inspiration/blob/master/webrtc_relative/image_bed/owt_level.jpg)
 
