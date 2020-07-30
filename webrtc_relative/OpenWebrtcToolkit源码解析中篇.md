@@ -644,7 +644,6 @@ void ConferenceSocketSignalingChannel::SendInitializationMessage(
             ...
             ..
             .
-         }
        },
        on_failure);
 }
