@@ -3,7 +3,7 @@
 
 ### 珍惜他人劳动成果，转载请注明[原文地址](https://github.com/AshineReal/Inspiration/blob/master/webrtc_relative/OpenWebrtcToolkit%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B8%8A%E7%AF%87.md)
 
-#### 继续[上篇]()的内容，这里回顾一下，上篇主要分析了配置client及入会流程，入会流程中通过媒体信令通道socket.io建立tcp连接，然后获取到房间信息，解析并缓存，通过匿名函数回调到join调用处。也就是说此时join的回调已经获取到了房间info，业务方可以对其进行选择订阅或者不订阅，业务方此时也可以选择发布或者不发布自己的流
+#### 继续[上篇](https://github.com/AshineReal/Inspiration/blob/master/webrtc_relative/OpenWebrtcToolkit%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B8%8A%E7%AF%87.md)的内容，这里回顾一下，上篇主要分析了配置client及入会流程，入会流程中通过媒体信令通道socket.io建立tcp连接，然后获取到房间信息，解析并缓存，通过匿名函数回调到join调用处。也就是说此时join的回调已经获取到了房间info，业务方可以对其进行选择订阅或者不订阅，业务方此时也可以选择发布或者不发布自己的流
 
 #### 这里有个概念就是，owt遵循更加自由灵活度更高的方式，让业务方自行选择并决定订阅流和发布流的策略，没有进行自动订阅（这里发布和订阅的概念和licode中使用的概念类似）。所以想要看到房间内其它人的流，需要对该流进行订阅操作，只有发布过的流才会存在在房间信息内的流列表中，对应的其它端若是取消发布流，则流列表也会去掉该流（owt对外接口没有暴露取消订阅或取消发布的api，内部实现和licode类似是有这个概念和操作的），所以这是一个动态过程，不管用户何时加入房间都可以获取到最新的流列表，接下来就来分析对于已经加入房间中的用户，如何实时获取到新的流变化并作出何处理流程
 
@@ -64,7 +64,7 @@ for (const std::string& notification_name :
 
 ```
 
-这里主要看正常的监听 notification_name 调用方法 OnNotificationFromServer
+**这里主要看正常的监听 notification_name 调用方法 OnNotificationFromServer**
 
 继续往下走 该方法较长(近100行)因为该方法对于分析过程比较重要，这里还是贴出全部代码
 
@@ -168,13 +168,13 @@ void ConferenceSocketSignalingChannel::OnNotificationFromServer(
 }
 ```
 
-分析下来就是几个event的case
+**分析下来就是几个event的case**
 
-1. kEventNameStreamMessage这个是定义的关于流的一些信息的事件
-2. kEventNameTextMessage这个是定义的关于文本消息的一些信息的事件(没错 这里提到了文本消息的发送，owt提供了简单的本文消息发送，丰富了基于webrtc音视频会议房间的业务场景)
-3. kEventNameOnUserPresence定义了关于用户进退及用户信息更新的信息事件
-4. kEventNameOnSignalingMessage定义了信令消息(先揭露之后再详细说明 这里其实是sdp协商过程所需的offer answer candidate等信令协商事件)
-5. kEventNameOnDrop消息丢失服务器关闭连接
+1. **kEventNameStreamMessage这个是定义的关于流的一些信息的事件**
+2. **kEventNameTextMessage这个是定义的关于文本消息的一些信息的事件(没错 这里提到了文本消息的发送，owt提供了简单的本文消息发送，丰富了基于webrtc音视频会议房间的业务场景)**
+3. **kEventNameOnUserPresence定义了关于用户进退及用户信息更新的信息事件**
+4. **kEventNameOnSignalingMessage定义了信令消息(先揭露之后再详细说明 这里其实是sdp协商过程所需的offer answer candidate等信令协商事件)**
+5. **kEventNameOnDrop消息丢失服务器关闭连接**
 
 这里主要来看kEventNameStreamMessage事件
 
@@ -224,7 +224,6 @@ void ConferenceClient::TriggerOnStreamAdded(sio::message::ptr stream_info,bool j
 ### 总结: 基于事件监听的socket.io模型 通过事件监听回调流的增删改信息，这也解释了开头提出的问题，对于已经在会议中的用户，如何获取最新的流变更信息。
 
 #### 文章开头已经提出了订阅和发布的概念这里继续分析这两个api
-
 
 ### Publish的流程
 
@@ -353,7 +352,7 @@ std::shared_ptr<ConferencePeerConnectionChannel> pcc(
       new ConferencePeerConnectionChannel(config, signaling_channel_,event_queue_));
 ```
 
-继续追踪到ConferencePeerConnectionChannel的publish实现
+**继续追踪到ConferencePeerConnectionChannel的publish实现**
 
 ```cpp
 // Failure of publish will be handled here directly; while success needs
@@ -562,7 +561,7 @@ void ConferenceSocketSignalingChannel::SendInitializationMessage(
 
 通过 **event_name = kEventNamePublish** 及 **event_name = kEventNameSubscribe** 看出publish和subscribe共享了该方法
 emit发送的参数为event_name及options,回应ack message为“ok”时回调on_success
-注意! 这里当ack message的status为ok时 取出了session_id **std::string session_id = msg.at(1)->get_map()["id"]** 并把session_id通过on_success回调回去（记住这个session_id, 原因之后解释,这里先给出结论:这个session_id才是publish发布流的关键,它相当于在服务器端创建了一个会话标识,后续的流的sdp交互等流相关操作都会通过该标识作为关键key传递）
+注意! 这里当ack message的status为ok时 取出了session_id **std::string session_id = msg.at(1)->get_map()["id"]** 并把session_id通过on_success回调回去（**记住这个session_id, 原因之后解释,这里先给出结论:这个session_id才是publish发布流的关键,它相当于在服务器端创建了一个会话标识,后续的流的sdp交互等流相关操作都会通过该标识作为关键key传递**）
 
 ```cpp
 void ConferencePeerConnectionChannel::SetSessionId(const std::string& id) {
@@ -574,20 +573,20 @@ std::string ConferencePeerConnectionChannel::GetSessionId() const {
 }
 ```
 
-再回来看conferencepeerconnectionchannel的on_success部分将返回的session_id的
-进行了成员变量保存并提供了set和get的方式(这里使用成员变量是因为pcc的实例是每次publish都会构建新的，也就是说两次publish之间是独立不影响的，这里先给出结论subscribe也是同理，也就是说conferenceclient依靠conferencepeerconnectionchannel做到了不同publish不同subscribe之间的业务隔离，conferencepeerconnectionchannel只需关注当前成员变量session_id_描述的流维护即可)
+**再回来看conferencepeerconnectionchannel的on_success部分将返回的session_id的
+进行了成员变量保存并提供了set和get的方式(这里使用成员变量是因为pcc的实例是每次publish都会构建新的，也就是说两次publish之间是独立不影响的，这里先给出结论subscribe也是同理，也就是说conferenceclient依靠conferencepeerconnectionchannel做到了不同publish不同subscribe之间的业务隔离，conferencepeerconnectionchannel只需关注当前成员变量session_id_描述的流维护即可)**
 
-至此publish发布流的过程已经清晰
+**至此publish发布流的过程已经清晰
 OWTConferenceClient -> conferenceclient -> conferencepeerconnectionchannel -> conferencesocketsignalingchannel
--> socketio
+-> socketio**
 
-ack的流程则与之相反
+**ack的流程则与之相反
 socketio -> conferencesocketsignalingchannel -> conferencepeerconnectionchannel
-而webrtc处理主要集中在conferencepeerconnectionchannel，conferencesocketsignalingchannel则是集中处理和接收socketio的消息
+而webrtc处理主要集中在conferencepeerconnectionchannel，conferencesocketsignalingchannel则是集中处理和接收socketio的消息**
 
 ### Subscribe的流程
 
-由于publish的流程和publish类似这里只贴出关键代码
+由于subscribe的流程和publish类似这里只贴出关键代码
 
 conferenceclient中subscribe片段
 
@@ -608,9 +607,12 @@ conferenceclient中subscribe片段
       on_failure);
 ```
 
-conferencepeerconnectionchannel中片段
+conferencepeerconnectionchannel中subscribe代码片段
 
 ```cpp
+ .
+ ..
+ ...
  signaling_channel_->SendInitializationMessage(
       sio_options, "", stream->Id(),
       [this](std::string session_id) {
@@ -621,12 +623,38 @@ conferencepeerconnectionchannel中片段
       on_failure);  // TODO: on_failure
 ```
 
-可以看到最终都是调用SendInitializationMessage方法回调session_id
-传入的streamId并没有使用仅当作publish还是subscribe的占位判断所以实际标识还是使用的session_id
+查看conferencesocketsignalingchannel中SendInitializationMessage方法
 
-#### 总的来看owt信令实现了逻辑分层,conferenceclient作为最初的入口及回调最后的出口基本管控OWTConferenceClient暴露出来的接口,conferencepeerconnectionchannel管控粒度更加细致的工作，包括发布订阅流及sdp生成接收安装等主要依赖webrtc的实现，接下来就是conferencesocketsignalingchannel实现对接socketio，提供了各上层需要的信令交互最基本的api调用实现和事件监听分流回调，总结如下图所示(由于仅分析了源码部分conference模块，p2p的实现与此类似，就不多作陈述，图示也不具体给出了)
+```cpp
+void ConferenceSocketSignalingChannel::SendInitializationMessage(
+    sio::message::ptr options,
+    std::string publish_stream_label,
+    std::string subscribe_stream_label,
+    std::function<void(std::string)> on_success,
+    std::function<void(std::unique_ptr<Exception>)> on_failure) {
+  sio::message::list message_list;
+  message_list.push(options);
+  std::string event_name;
+  if (publish_stream_label != "")
+    event_name = kEventNamePublish;
+  else if (subscribe_stream_label != "")
+    event_name = kEventNameSubscribe;
+  Emit(event_name, message_list,
+       [=](sio::message::list const& msg) {
+            ...
+            ..
+            .
+       },
+       on_failure);
+}
+```
 
-[owt_level](https://github.com/AshineReal/Inspiration/blob/master/webrtc_relative/image_bed/owt_level)
+**可以看到最终都是调用SendInitializationMessage方法回调session_id
+传入的streamId并没有使用仅当作publish还是subscribe的占位判断所以实际标识还是使用的session_id**
+
+#### 总的来看owt信令实现了逻辑分层,conferenceclient作为最初的入口及回调最后的出口基本管控OWTConferenceClient暴露出来的接口(业务分层),conferencepeerconnectionchannel管控粒度更加细致的工作，包括发布订阅流及sdp生成接收安装等主要依赖webrtc的实现(webrtc媒体分层)，接下来就是conferencesocketsignalingchannel实现对接socketio，提供了各上层需要的信令交互最基本的api调用实现和事件监听分流回调(信令分层)。总结如下图所示(由于仅分析了源码部分conference模块，p2p的实现与此类似，就不多作陈述，图示也不具体给出了)
+
+![owt_level](https://github.com/AshineReal/Inspiration/blob/master/webrtc_relative/image_bed/owt_level.jpg)
 
 
 #### 至此上中篇已经分析了owt中信令的交互流程下篇我们再详细分析其中webrtc建立流连接的过程
