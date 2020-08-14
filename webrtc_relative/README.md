@@ -11,6 +11,8 @@
 
 ### [OpenWebrtcToolkit源码解析中篇](OpenWebrtcToolkit源码解析中篇.md)
 
+### [记录一处发现的socket.io cpp版本的错误](记录socket.io-cpp的一处错误.md)
+
 
 #### 如果你喜欢这个项目 给我一个star鼓励 ⭐️
 
