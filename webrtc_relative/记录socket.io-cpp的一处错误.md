@@ -361,7 +361,7 @@ void client_impl::on_decode(packet const& p)
 192.168.2.4 -> client 
 192.168.1.119 -> server
 
-![close](image_bed/close.png)
+![close](image_bed/client_close.png)
 
 websocket协议层部分看到opcode是1 ,代表文本消息
 然后line-based text data是 1 （socketio的实现里面可以了解这个1是close的文本消息） 然后看到opcode是8 在rfc6455标准中代表connection close
