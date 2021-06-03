@@ -18,6 +18,8 @@
 
 #include <functional> // bind函数适配器
 
+//#include <memo>
+
 #include "Sales_data.hpp"
 
 using std::cout;
@@ -166,6 +168,8 @@ void bubbleSort(vector<int> &ivec){
 }
 
 
+
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void forward_insert(forward_list<string> &sfl,string find,string ins);
@@ -175,6 +179,49 @@ void replace_str_by_index(string &s,const string &oldVal,const string &newVal);
 //void replace_str_by_iterator_replace(string &s,const string &oldVal,const string &newVal);
 
 bool check_size(const string &s, string::size_type sz);
+
+/////////////////////////////////////////////////////////////动态内存///////////////////////////////////////////////////////////////////////////
+
+// ch12.6
+vector<int> *foo(){
+    return new vector<int>;
+}
+
+void load_foo(istream &is,vector<int> *vp){
+    int val;
+    while (is >> val) {
+        vp->push_back(val);
+    }
+}
+
+void print_foo(vector<int>* vp){
+    for (auto i : *vp) {
+        cout << i << " ";
+    }
+    cout << endl;
+}
+
+// 12.7
+shared_ptr<vector<int>> foo_shared_ptr(){
+    return make_shared<vector<int>>();
+}
+
+void load_foo_shared_ptr(istream &is,shared_ptr<vector<int>> sp){
+    int val;
+    while (is >> val) {
+        sp->push_back(val);
+    }
+}
+
+void print_foo_shared_ptr(shared_ptr<vector<int>> sp){
+    for (auto i : *sp) {
+        cout << i << ",";
+    }
+    cout << endl;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 int main(int argc, const char * argv[]) {
     // insert code here...
@@ -411,8 +458,20 @@ int main(int argc, const char * argv[]) {
     vector<string> words{"Hello","World","The","End"};
     auto wc = std::find_if(words.begin(), words.end(), check5); // 使用参数绑定的方式传递函数作为谓词,而不是使用lambda
     
-//    back_inserter(fia);
-//    push_heap(fia, <#_RandomAccessIterator __last#>, <#_Compare __comp#>)
+    
+    
+    // ch12.6
+//    auto vp = foo();
+//    load_foo(cin, vp);
+//    print_foo(vp);
+//    delete vp;
+    
+    // ch12.7
+    auto sp = foo_shared_ptr();
+    load_foo_shared_ptr(cin, sp);
+    print_foo_shared_ptr(sp);
+    
+    
     
     return 0;
 }
@@ -487,5 +546,7 @@ void find_num_by_first_of(const string &s,const string &nums){
         ++pos;
     }
 }
+
+
 
 
